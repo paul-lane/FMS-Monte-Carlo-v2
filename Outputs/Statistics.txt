@@ -1,0 +1,25 @@
+     1000000 Total ingoing trajectories Created 
+      224550 Trajectories missing the wheel 
+  0.224549994     Fraction of trajectories missing the wheel 
+    16000000 Possible ingoing probed trajectories 
+      539116 Ingoing trajectories probed 
+   3.36947516E-02 Ingoing acceptance ratio 
+    12407200 Possible scattered trajectories 
+           0 Scattered trajectories probed 
+   0.00000000     Scattered trajectory acceptance ratio 
+           1       33250           0
+           2       34182           0
+           3       33674           0
+           4       33881           0
+           5       33589           0
+           6       33651           0
+           7       34112           0
+           8       34224           0
+           9       34038           0
+          10       33420           0
+          11       33780           0
+          12       33343           0
+          13       34131           0
+          14       33252           0
+          15       34164           0
+          16       32425           0
