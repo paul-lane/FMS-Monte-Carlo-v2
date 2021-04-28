@@ -1,0 +1,13 @@
+.false.			! overwrite ingoing speed y/n
+1500.0			! value of overwritten speed / ms-1
+.false.			! overwtite ingoing start positions 
+0.0D0	0.0D0		! value of overwritten x and y start pos / m (z not overwritten to maintain geometry)
+.false.			! overwrite ingoing trajectory vector
+0.0	0.0	1.0	! value of overwritten ingoing trajectory in x, y, z
+.false.			! overwrite outgoing speed
+500.0			! value of overwritten speed / ms-1
+.false.			! overwrite outgoing start positions
+0.0	0.0		! value of overwritten start positions in x and y / m
+.false.			! overwrite outgoing trajectory vector
+0.0	0.0	1.0	! value of overwritten outgoing trajectory in x, y, z / m
+

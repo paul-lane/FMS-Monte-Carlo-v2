@@ -1,0 +1,32 @@
+-0         			! angle of incidence / degrees. Not used for FM
+1000000         		! Number of (ingoing) particles generated
+.TRUE.				! Use sum of 3 Gaussians for speeds T/F T = yes, F = no, use Origin Parameters from Logistic5 fit 
+0.0	0.5	0.5	 	! Weightings for each of the 3 Gaussians (needs to sum to 1.0)
+150.0	150.0	180.0		! Mean (centre) of each of the 3 Gaussians
+2.0	2.0	15.0		! Standard deviation of each of the 3 Gaussians
+297.0D-03       		! valve to probe distance used in measurement which generated above Origin parameters / m (used in both Gaussian and Origin fits)
+59.91869D0			! x0 	(Origin function parameter for speed generation)
+1.00156D0			! Amax 	(Origin function parameter for speed generation)***
+-0.00641D0			! Amin 	(Origin function parameter for speed generation)***
+12.92025D0			! h 	(Origin function parameter for speed generation)
+317016.713D0			! s 	(Origin function parameter for speed generation)
+.true.        		 	! Output ingoing profile
+.false.          		! Output x-y beam profiles T/F
+.false.      			! Perform Scattering? True for scattered parameters, false for ingoing beam only
+0.0D0           		! Scatter Fraction in TD or IS (0 = TD only, 1 = IS only) Note for any scattering the flag above must be set to .true.
+0.026D0				! Molar mass of Molecule / kgmol-1
+0.5D0				! Fractional Energy loss to internal surface motions (Soft Sphere model) 0 = no energy loss, 1 = all energy lost
+120D0				! Surface Mass of liquid / gmol-1 (Soft Sphere model)
+0D0				! Exit angle / deg (Soft Sphere model)
+4               		! Power of cosine weighted IS angular distribution (cos^n)
+298.0D0         		! Surface Temperature / K
+3000.0D0      			! Max speed used in calculation of Maxwell-Boltzmann ditribution. Set higher for possiblity of higher speed being sampled /ms-1
+1				! Power of cosine weighted TD angular distribution (cos^n)
+.false.				! Blurring on (uses transverse speed components to overwrite geometry of MB)
+40D0				! Mean of Gaussian for ingoing transverse temp blurring / ms-1
+40D0				! Std Dev of Gaussian for ingoing transverse temp blurring / ms-1
+0.5D0				! Fraction of Gaussian in Gaussian/Lorentzian mix for ingoing transverse temp blurring (1 = all Gaussian, 0 = all Lorentzian)
+40D0				! Gamma value of Lorentzian for ingoing transverse temp blurring / ms-1		
+
+
+*** Note if Amax is less than 1 or Amin is greater than 0 some speeds will be generated as NAN
