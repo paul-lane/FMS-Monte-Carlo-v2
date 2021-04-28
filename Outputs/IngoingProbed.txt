@@ -1,0 +1,2 @@
+ List of x-y co-ordinates of ingoing probed trajectories at the centre of the Herriott Cell)
+ This file is blank as you have chosen not to output beam profiles

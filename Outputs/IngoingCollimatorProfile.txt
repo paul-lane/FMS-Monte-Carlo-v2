@@ -1,0 +1,2 @@
+ List of x-y co-ordinates of trajectories exiting the collimator
+ This file is blank as you have chosen not to output beam profiles

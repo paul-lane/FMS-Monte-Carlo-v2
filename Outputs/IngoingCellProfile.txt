@@ -1,0 +1,2 @@
+ List of x-y co-ordinates of ingoing trajectories at the centre of the probe plane (not all will be detected)
+ This file is blank as you have chosen not to output beam profiles
