@@ -1,6 +1,7 @@
 0.0	! Lower limit of transverse speed / ms-1
 2500.0	! Upper limit of transverse speed / ms-1
 1.0	! Speed step size (of input data) / ms-1 DO NOT CHANGE FROM 1.0
-100.0	! Laser step size (data to output) / MHz
+10.0	! Laser step size (data to output) / MHz
 12644.18 ! Transition frequency / cm-1 12644.18	
 400.0	! Modulation frequency / MHz
+16.5	! gamma for Lorentzian width of laser / MHz

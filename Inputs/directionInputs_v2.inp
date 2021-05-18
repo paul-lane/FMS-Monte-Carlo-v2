@@ -1,7 +1,7 @@
 -0         			! angle of incidence / degrees. Not used for FM
-1000000         		! Number of (ingoing) particles generated
-.TRUE.				! Use sum of 3 Gaussians for speeds T/F T = yes, F = no, use Origin Parameters from Logistic5 fit 
-0.0	0.5	0.5	 	! Weightings for each of the 3 Gaussians (needs to sum to 1.0)
+10000000         		! Number of (ingoing) particles generated
+.FALSE.				! Use sum of 3 Gaussians for speeds T/F T = yes, F = no, use Origin Parameters from Logistic5 fit 
+0.0	0.5	0.5	 	! Weightings for each of the 3 Gaussians
 150.0	150.0	180.0		! Mean (centre) of each of the 3 Gaussians
 2.0	2.0	15.0		! Standard deviation of each of the 3 Gaussians
 297.0D-03       		! valve to probe distance used in measurement which generated above Origin parameters / m (used in both Gaussian and Origin fits)

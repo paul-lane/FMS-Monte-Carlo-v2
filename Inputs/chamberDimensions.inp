@@ -1,9 +1,9 @@
-0.000D-0	!Skimmer Position z direction / m
+0.2800D-0	!Skimmer Position z direction / m
 0.3170D0 	!Valve position z direction / m
-0.000D-0    	!Collimator position in z direction / m
-40.00D-3	!radius of skimmer / m
+0.280D-0    	!Collimator position in z direction / m
+1.00D-3		!radius of skimmer / m
 5.00D-4		!radius of valve / m
-40.00D-3   	!radius of collimator /m
+1.00D-3   	!radius of collimator /m
 0.020D0  	!z-position of the centre of the Herriott cell / m
 0.0D0		!x-position of wheel centre / m (if on axis should always be zero) hit wheel subroutine  
 -2.50D-2	!y-position of wheel centre / m (this is the offset between the wheel axle and z-axis of chamber -ve indicates below MB axis)
