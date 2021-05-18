@@ -1,7 +1,7 @@
 include "Constants/mathConstants.f90"
 
 
-	Program PickingSteps
+	Program LorentzianLaser
 
 ! A program to combine multiple transverse speed bins in order to make them
 ! the appropriate size for conversion into FM lineshapes
@@ -23,7 +23,7 @@ include "Constants/mathConstants.f90"
 
 	Double Precision, dimension(:), allocatable :: sampledSpeed, outputLine
 	Integer :: i, k, roundedDoppler, nspeeds, binsize, nbins, remove, ninputs
-	Integer :: sampled, j, n
+	Integer :: sampled, j, n, index
 
 	Integer :: halfLorentzian, nLorentzianPoints, x
 	Double Precision :: totalLorWeight, weightedAmplitude
@@ -99,7 +99,7 @@ include "Constants/mathConstants.f90"
 	! we need to truncate the Lorentzian
 	! we will limit it's range of application to +/- 4gamma
 	
-	halfLorentzian = nint(4*gamma)
+	halfLorentzian = nint(4*gamma)							! Half Lorentzian width in 1ms-1 bins size steps (no of points in half Lorentzian)					
 	nLorentzianPoints = halfLorentzian*2 + 1
 	
 	Allocate(LorWeight(nLorentzianPoints))
@@ -139,15 +139,27 @@ include "Constants/mathConstants.f90"
 
 		sampled=0								! Set sampled = 0
 		j=0									! Set j = 0 each time the loop starts
-		Do While (sampled .le. (uplimit-roundedDoppler-halfLorentzian))			! For the range of Doppler limits
+		Do While (sampled .le. (uplimit-roundedDoppler-halfLorentzian))			! For the range of Doppler limits minus the half lorentzian width
 			n = j+1								! n is the index of the array where the data is to be stored
-			sampled = nint((j+0.5)*DopplerSize)				! Calculate the sampled speeds (first point is 0.5 step for zero)
+			sampled = nint((j+0.5)*DopplerSize)				! Calculate the sampled speeds (first point is 0.5 step from zero)
 
 			Do x = 1, nLorentzianPoints
-				weightedAmplitude = (LorWeight(x)*amplitude(sampled-halfLorentzian+x))/totalLorWeight			
+
+
+				index = sampled-halfLorentzian+x
+				if(index .lt. 1) then
+					index = -index
+				endif
+				
+				if(x .eq. 1) then				
+				Write(*,*) nLorentzianPoints, sampled, halfLorentzian, sampled-halfLorentzian+x, index
+
+				end if 
+					
+				weightedAmplitude = (LorWeight(x)*amplitude(index))/totalLorWeight			
 				outputLine(n) = weightedAmplitude+outputLine(n)
 			End do
-				Write(2000+i,*) Speed(sampled), outputline(n)
+				Write(2000+i,*) Speed(sampled+1), outputline(n)		! Want speed at sampled+1 as the index starts at 0 so 1 is position 2 etc...
 			j=j+1
 			
 		End do 
@@ -155,6 +167,6 @@ include "Constants/mathConstants.f90"
 
 
 	End do
-	End Program PickingSteps
+	End Program LorentzianLaser
 	
  	
