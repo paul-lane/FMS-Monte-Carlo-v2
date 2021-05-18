@@ -152,7 +152,7 @@ include "Constants/mathConstants.f90"
 				endif
 				
 				if(x .eq. 1) then				
-				Write(*,*) nLorentzianPoints, sampled, halfLorentzian, sampled-halfLorentzian+x, index
+!				Write(*,*) nLorentzianPoints, sampled, halfLorentzian, sampled-halfLorentzian+x, index
 
 				end if 
 					
