@@ -30,7 +30,7 @@ program MCScatteringFM
     Double Precision :: incidenceAngle, x0, aMax, aMin, h, s, dist, massMol, energyTrans, surfaceMass, exitAngle, temp
     Double Precision :: maxSpeed, scatterFraction, mass
     Double Precision :: gMean, gStdDev, lgFraction, lGamma
-    Double Precision :: w1, w2, w3
+    Double Precision :: weight1, weight2, weight3, sumweight, w1, w2, w3
     Real :: m1, m2, m3, std1, std2, std3
     Logical :: scattering, outputIngoing, xyOutput, blurOn, GaussSpeeds
 
@@ -146,7 +146,7 @@ program MCScatteringFM
      Read(11,*) incidenceAngle						! Angle of incidence (not used)
      Read(11,*) ncyc                                                    ! Number of trajectories
      Read(11,*) GaussSpeeds						! Use Gaussian Speeds T/F 
-     Read(11,*) w1, w2, w3						! Weighting of 3 Gaussians
+     Read(11,*) weight1, weight2, weight3				! Weighting of 3 Gaussians
      Read(11,*) m1, m2, m3						! Mean of the 3 Gaussians
      Read(11,*) std1, std2, std3					! Standard deviation of the 3 Gaussians
      Read(11,*) dist							! Valve-Probe Distance at which the characterised apperance profile was recorded	
@@ -174,26 +174,12 @@ program MCScatteringFM
      Read(11,*) lGamma							! Gamma for Lorentzian in transverse temp blurring
      Close(11)
 
-     if((GaussSPeeds .eqv. .TRUE.) .AND.  (w1+w2+w3 .lt. 0.99)) then	! Check total weight of Gaussians is not too low
-	Write(*,*) 'Sum of Gaussians is less than 1'			! 1% allowed for rounding 
-	Write(*,*) 'Code will not run' 
-	Write(*,*) 'Please correct the input file'
-	Stop
-     end if
+     sumWeight= weight1 + weight2 + weight3
+     w1 = weight1/sumWeight
+     w2 = weight2/sumWeight
+     w3 = weight3/sumWeight
 
-     if((GaussSpeeds .eqv. .TRUE.) .AND. (w1+w2+w3 .gt. 1.01)) then	! Check total weight of Gaussians is not too high
-	Write(*,*) 'Sum of Gaussians is greater than 1'			! 1% allowed for rounding
-        Write(*,*) 'Code will not run' 
-        Write(*,*) 'Please correct the input file'	
-	Stop
-     end if
-     
-     if((w1 .lt. 0.0) .OR. (w2 .lt. 0.0) .OR. (w3 .lt. 0.0)) then	! Check none of weights are negative
-	Write(*,*) 'You cannot have a negative Gaussian weight'
-        Write(*,*) 'Code will not run' 
-        Write(*,*) 'Please correct the input file'
-	Stop
-     end if 
+
 
      mass = massMol/avagadro
 
