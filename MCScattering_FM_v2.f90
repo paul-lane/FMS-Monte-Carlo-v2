@@ -174,9 +174,9 @@ program MCScatteringFM
      Read(11,*) lGamma							! Gamma for Lorentzian in transverse temp blurring
      Close(11)
 
-     weight1 = weight1/std1
-     weight2 = weight2/std2
-     weight3 = weight3/std3
+     !weight1 = weight1/std1
+     !weight2 = weight2/std2
+     !weight3 = weight3/std3
      
      sumWeight= weight1 + weight2 + weight3
      w1 = weight1/sumWeight
