@@ -3,6 +3,10 @@ module speeds_v2
 
     contains
 
+!********************************************
+! INGOING SPEED
+!********************************************
+
         ! Calculates speed of ingoing particle based on cumulative integral function
         subroutine ingoing_speed(x0, aMax, aMin, h, s, dist, pulseLength, speed, t0)
 
@@ -23,6 +27,10 @@ module speeds_v2
             speed = dist/(arrivalTime*1D-6)
         end subroutine ingoing_speed
 
+
+!********************************************
+! INGOING SPEED FROM THREE GAUSSIANS
+!********************************************
 
 	! Calculates speed of an ingoing particle based on cumulative integral of 3 Gaussians
 	subroutine ingoing_speed_from_Gauss(w1, w2, w3, m1, m2, m3, std1, std2, std3, dist, pulseLength, speed, t0)
@@ -54,6 +62,11 @@ module speeds_v2
 	    speed = dist/(arrivalTime*1.0D-6)
 	
 	end subroutine ingoing_speed_from_Gauss
+
+
+!********************************************
+! RANDOM NUMBER FROM GAUSSIAN DISTRIBUTION
+!********************************************
 
 	! subroutine to draw a random number from a Gaussian distribution
 	subroutine rnm(rmean, sd,rand)
@@ -96,7 +109,9 @@ module speeds_v2
       	end subroutine rnm
 
 
-
+!********************************************
+! MAXWELL-BOLTZMANN SPEED DISTRIBUTION
+!********************************************
 
         ! Calculates speed based on Maxwell-Boltzmann Distribution of speeds
         subroutine MB_speed(maxSpeed, temp, mass, mostLikelyProbability, scatteredSpeed)
@@ -129,6 +144,11 @@ module speeds_v2
             end do
         end subroutine MB_speed
 
+
+!********************************************
+! LORENTZIAN DISTRIBUTION
+!********************************************
+
         ! Generates random Lorentizan distributed value. Gamma is the scale parameter equal to HWHM of desired function.
         subroutine lorentzian_distribution(gamma, speed)
             implicit none
@@ -141,6 +161,11 @@ module speeds_v2
             speed = gamma*tan(pi*(rand-0.5D0))
 
         end subroutine lorentzian_distribution
+
+
+!********************************************
+! GAUSSIAN DISTRIBUTION
+!********************************************
 
         ! This method apparently is very efficient, however it generates two Gaussian distributed numbers at a time
         ! Make sure this is incorporated somehow to avoid wasting cycles
@@ -169,6 +194,10 @@ module speeds_v2
                 end if
             end do
         end subroutine
+
+!********************************************
+! TRANSVERSE TEMPERATURE SPEED TEST
+!********************************************
 
         ! Adds a transverse speed to molecule exiting final apperture 
         subroutine transverse_temp_test(mean, sigma, gamma, gaussLorFraction, zPos, travelDistance, &
@@ -205,20 +234,26 @@ module speeds_v2
  
         end subroutine transverse_temp_test 
 
+
+!********************************************
+! TRANSVERSE TEMPERATURE
+!********************************************
+
+
         subroutine transverse_temp(mean, sigma, gamma, l_g_fraction, zPos, travelDistance, startTime, speed, startPoint, vector)
             implicit none
 
             double precision, dimension(3) :: startPoint
             double precision, dimension(3), intent(inout) :: vector
             double precision, intent(in) :: mean, sigma, l_g_fraction, gamma
-            double precision :: zPos, travelDistance, startTime, speed, transSpeed, rand, z2
+            double precision :: zPos, travelDistance, startTime, speed, transSpeed, rand, z2, theta
 
             startTime = (startTime + abs(travelDistance/(vector(3)*speed)))
             startPoint(1) = startPoint(1) + (startTime*speed*vector(1))
             startPoint(2) = startPoint(2) + (startTime*speed*vector(2))
             startPoint(3) = zPos
 
-            vector = vector*speed
+            vector = vector*speed	
 
             call random_number(rand)
 
@@ -228,21 +263,40 @@ module speeds_v2
                 call gaussian_distribution(mean, sigma, transSpeed, z2)
             end if
 
-            vector(1) = transSpeed
 
-            call random_number(rand)
+!            vector(1) = transSpeed
+	    vector(1) = transSpeed/speed			! PDL Modification 01/06/2021
+
+           call random_number(rand)
 
             if (rand .gt. l_g_fraction) then
                 call lorentzian_distribution(gamma, transSpeed)
+
             else
                 call gaussian_distribution(mean, sigma, transSpeed, z2)
+
             end if
 
-            vector(2) = transSpeed
+!            vector(2) = transSpeed
+	    vector(2) = transSpeed/speed			! PDL Modification 01/06/2021		
 
-            vector = vector/norm2(vector)
+!! PDL COMMENTED THIS OUT 01/06/2021
+!!            vector = vector/norm2(vector)
+	    vector(3) = vector(3)/speed
+
+! PDL: Note the unmodified version of the code in re-normalizing the vectors was reducing the z components speed which has an effect on the
+! Time at which particles turn up in the App Profile. It also reduces the amount of transverse velocity put into the beam in the process.
+! The changes that I have made allow the original z-component speed to remain the same but add extra transverse components which agree with
+! the parameters which are input. The vector passed back to the main code is now NOT a unit vector but one which allows the speeds selected
+! here to be reproduced by the main code...
+
 
         end subroutine transverse_temp
+
+
+!********************************************
+! MAXWELL-BOLTZMANN PROBABILITY
+!********************************************
 
         ! Finds probability of particle travelling at given speed
         function MB_probability(temp, speed, mass) result(probability)
@@ -259,6 +313,12 @@ module speeds_v2
 
         end function MB_probability
 
+
+!********************************************
+! MOST PROBABLE SPEED
+!********************************************
+
+
         ! Finds the most probable speed and its probability to use in normalisation 
         function MB_most_likely (temp, mass) result(mostLikelyProbability)
 
@@ -268,6 +328,12 @@ module speeds_v2
             mostLikelyProbability = MB_probability(temp, mostProbableSpeed, mass)
 
         end function MB_most_likely
+
+
+!********************************************
+! DEFLECTION ANGLE
+!********************************************
+
 
         subroutine deflection_angle(ingoing, outgoing, deflectionAngle)
             implicit none
@@ -281,6 +347,11 @@ module speeds_v2
             deflectionAngle = acos(dot_product(ingoing,outgoing) / (norm2(ingoing)*norm2(outgoing))) * (360.0D0/(2*pi))
 
         end subroutine deflection_angle
+
+
+!********************************************
+! SOFT SPHERE SPEED
+!********************************************
 
         subroutine soft_sphere_speed(mass, internalRatio, surfaceMass, initialSpeed, deflectionAngle, finalSpeed)
             implicit none

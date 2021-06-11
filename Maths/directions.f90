@@ -4,6 +4,10 @@ module directions
 
     contains
 
+!********************************************
+! INGOING DIRECTION
+!********************************************
+
         ! Finds a trajectory that passes though skimmer and collimator
         subroutine ingoing_direction(valveRad, valvePos, skimRad, skimPos, colRad, colPos, ingoingUnitVector, valve)
 
@@ -48,6 +52,10 @@ module directions
 
         end subroutine ingoing_direction
 
+!********************************************
+! ROTATION
+!********************************************
+
         subroutine rotation(oldVector, theta, newVector)
 
             double precision, intent(in), dimension(3) :: oldVector
@@ -71,6 +79,10 @@ module directions
             newVector = MATMUL(rotationMatrix, oldVector)
 
         end subroutine rotation
+
+!********************************************
+! COSINE DISTRIBUTION
+!********************************************
 
         ! It must be noted that this cosine distribution of scattering angles is simply a function that fits data,
         ! not necessarily the absolute correct distribution one would expect to see
@@ -97,6 +109,10 @@ module directions
             
         end subroutine cosine_distribution
 
+!********************************************
+! DISK PICK
+!********************************************
+
         !Randomly pick a points from a unit radius circle.
         subroutine disc_pick(x,y)
 
@@ -118,6 +134,10 @@ module directions
 
         end subroutine disc_pick
 
+!********************************************
+! FIT LINE
+!********************************************
+
         !calculates the gradient and intercept of the line which connect the point on the skimmer and valve
         !note x and y are used here to mean y=mx+c not in reference to chamber coordinates (z chamber is x here)
         subroutine fit_line (y2, x2, y1, x1, m, c)
@@ -129,6 +149,11 @@ module directions
             c = y2 - (m*x2)
 
         end subroutine fit_line
+
+!********************************************
+! UNIT VECTOR
+!********************************************
+
 
         !Calcualtes unit vectors from gradients of the lines in the x and y directions. 
         subroutine unit_vector (mx, my, v)
