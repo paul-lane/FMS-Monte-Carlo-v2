@@ -2,11 +2,11 @@
 ! Program to calculate the integral and FM absorption from the transverse speed distributions
 ! ********************************************************************************************
 
-	include "Maths/fmDetection.f90"
+	include "Maths/fmDetection_v2.f90"
 
 	Program Absorption
 
-	use fmDetection
+	use fmDetection_v2
 
 	Implicit None
 

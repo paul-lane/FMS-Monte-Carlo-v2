@@ -9,15 +9,15 @@
 include "Constants/mathConstants.f90"
 include "Maths/speeds_v2.f90"
 include "Maths/directions.f90"
-include "Maths/fmDetection.f90"
+include "Maths/fmDetection_v2.f90"
 
-program MCScatteringFM
+program MCScatteringFM_v2
 
 ! Tell the code to use the specified modules
     use speeds_v2
     use directions
     use mathConstants
-    use fmDetection
+    use fmDetection_v2
  
     implicit none
 
@@ -776,4 +776,4 @@ program MCScatteringFM
     print '(a, F4.2, a)', "        ", 1.0*acceptedScattered/((ncyc-missWheel)*npass), " Scattered trajectory acceptance ratio "
     print *,
 
-end program MCScatteringFM
+end program MCScatteringFM_v2
