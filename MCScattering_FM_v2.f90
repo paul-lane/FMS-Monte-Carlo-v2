@@ -38,6 +38,7 @@ program MCScatteringFM_v2
     Double Precision :: skimPos, valvePos, colPos, skimRad, valveRad, colRad, probeCentre 
     Double Precision :: wheelCentrex, wheelCentrey, wheelRadius, wheelBathy	! All hit wheel subroutine parameters
     Double Precision :: bathTop							! height (y) of top of bath
+    Double Precision :: rmax							! Maximum distance off axis a particle can be to be probed (chamber radius)
 
 ! Variables from timing inputs (defined in input file)
     Double Precision :: pulseLength, probeStart, probeEnd, tStep
@@ -93,7 +94,10 @@ program MCScatteringFM_v2
     Logical:: intersect, hit							! Particle intersects beam, Particle hits wheel
     Double Precision:: entryTime, exitTime					! Time particle enters and exits laser beam
     Integer:: startTimePoint, endTimePoint                                      ! The time bin that the particle enters and exits the beam (entry and exit times mapped
-										! onto the App Profile grid of points)
+    Double Precision, dimension(3) :: wheelPos					! onto the App Profile grid of points)
+    Integer, dimension(2) :: beyondMax, both
+    Double Precision:: radialDist
+    Logical, dimension(2) :: outOfBounds
 
 ! Scattering parameters 
     Double Precision:: mostLikelyProbability					! Most likely probability for Maxwell-Boltzmann
@@ -116,6 +120,8 @@ program MCScatteringFM_v2
     acceptedIngoing = 0
     acceptedScattered = 0
     missWheel = 0
+    beyondMax = 0
+    outOfBounds = .false.
 
 !*****************************************
 ! GENERATE RANDOM SEED
@@ -198,6 +204,7 @@ program MCScatteringFM_v2
      Read(12,*) wheelCentrey						! centre of wheel in y direction (wheel axle is offset with respect to chamber axis)
      Read(12,*) wheelRadius						! radius of wheel
      Read(12,*) wheelBathy						! distance between wheel axle and top of bath 
+     Read(12,*) rmax							! maximum off axis distance a particle can be to be probed
      Close(12)
 
      bathTop = wheelCentrey - wheelBathy				! position of the top of the bath (used for hit wheel subroutine
@@ -222,7 +229,7 @@ program MCScatteringFM_v2
      Read(14,*) speedEnd						! Fastest speed in Transverse speed profile
      Read(14,*) speedStep						! Speed step size of transverse speed profile
 
-! Note that there are more lines to tis input file containing laser step size, transition frequency and modulation frequency
+! Note that there are more lines to this input file containing laser step size, transition frequency and modulation frequency
 ! but these are not required for this code so are not called...
 
      Close(14)
@@ -339,8 +346,15 @@ program MCScatteringFM_v2
     Open(unit=28,file='Outputs/ScatteredProbed.txt')
     Write(28,*) "List of x-y co-ordinates of ingoing probed trajectories at the centre of the Herriott Cell)"
 
+    Open(unit=29,file='Outputs/IngoingOutOfBounds.txt')
+    Write(29,*) "List of x-y co-ordinates of ingoing trajectories which are out of bounds at the centre of the probe)"
+
+    Open(unit=30,file='Outputs/ScatteredOutOfBounds.txt')
+    Write(30,*) "List of x-y co-ordinates of scattered trajectories which are out of bounds at the centre of the probe)"
+
+
     if(xyOutput .eqv. .false.) then
-	Do i = 22, 28
+	Do i = 22, 30
  	 	Write(i,*) "This file is blank as you have chosen not to output beam profiles"
 	End do 
     endif
@@ -374,10 +388,6 @@ program MCScatteringFM_v2
 		particleSpeed(1), particleStartPos(1,:), particleVector(1,:))
 
 	endif
-
-
-	Write(29,*) particleVector(1,:)*particleSpeed(1)
-
 
 
 
@@ -558,7 +568,7 @@ program MCScatteringFM_v2
             call Euler(particleVector(j,:), th1(k), th2(k), EulerVector(j,:))
 	    call Euler(particleStartPos(j,:), th1(k), th2(k), EulerStartPos(j,:))
 	    call Euler(probeCentreVector(:), th1(k), th2(k), EulerCellCentre(:))	        
-	
+
 
 !***********************************************
 ! CHECKS BEAM INTERSECTION
@@ -568,6 +578,40 @@ program MCScatteringFM_v2
 ! Check if there is an intersection between trajectory and laser beam
 
            call checkIntersect(EulerVector(j,:), EulerStartPos(j,:), rLaser, EulerCellCentre(:), Intersect)
+
+
+!***********************************************
+! CHECK IF PARTICLE IS WITHIN BOUNDS
+! Applies a maximum radius that particles must be in, in order to be probed
+!***********************************************
+
+! When using the blurring or attempting to simulate a freejet the beam can expand beyond the bounds of the chamber
+! this routine allows these trajectories to be ignored. We use the getProfile subroutine to get the x and y co-ordinates
+! and convert these to a radial distance, if the radial distance is greater than the defined value rmax the trajectory is ignored
+	
+!	   if(j .eq. 1) then
+           	z = abs(particleStartPos(j,3) - probeCentre)
+           	call getProfile(particleVector(j,:), particleStartPos(j,:), z, profile)
+           	radialDist=sqrt(profile(1)**2 + profile(2)**2)
+           	if(radialDist .gt. rmax) then
+			outOfBounds(j) = .true.
+                	intersect = .false.
+                	if(k .eq. 1) then                                               ! For the first pass only we iterate a counter to determine the
+                        	beyondMax(j) = beyondMax(j) + 1                         ! number of trajectories that are excluded
+				if(xyoutput .eqv. .true.) then					! Write out of bounds profiles
+
+					if(j .eq. 1) then
+						Write(29,*) profile(1), profile(2)
+					endif
+
+					if(j .eq. 2) then
+						Write(30,*) profile(1), profile(2)
+					endif
+
+				endif
+			endif
+           	endif
+!	   endif
 
 
 !***********************************************
@@ -581,8 +625,9 @@ program MCScatteringFM_v2
 	    ! to be probed.  
 
 
-!	   if(j .eq. 2) then							! This used to only be run for scattered particles but is needed to see which
+	   if(j .eq. 2) then							! We only look at scattered trajectories as 
 										! ingoing trajectories miss the wheel...
+
 	   	call hitWheel(particleStartPos(2,:), wheelCentrex, wheelCentrey, wheelRadius, bathTop, hit)
  	    	
 		if(hit .eqv. .false.) then					! If we have a trajectory missing the wheel we only add to the counter on the
@@ -594,10 +639,36 @@ program MCScatteringFM_v2
 				if(xyOutput .eqv. .true.) then
 					Write(22,*) particleStartPos(2,1), particleStartPos(2,2)
 				end if
+	
 			end if						
 		endif								
 
-!	   endif
+	   endif
+
+	   ! The above routine prevents the scattered particles that miss the wheel from being probed. and counts them
+	   ! if we are running a simulation just looking at the ingoing beam it is still useful to know how many trajectories
+	   ! missed the wheel. The following section does that count, note that it does not stop ingoing trajectories from being probed
+ 
+	   if(scattering .eqv. .false.) then
+
+                wheelPos(1) = particleStartPos(1,1) + (particleVector(1,1)*tWheel*particleSpeed(1))
+                wheelPos(2) = particleStartPos(1,2) + (particleVector(1,2)*tWheel*particleSpeed(1))
+                wheelPos(3) = 0
+
+		   call hitWheel(wheelPos, wheelCentrex, wheelCentrey, wheelRadius, bathTop, hit)
+		
+		   if(hit .eqv. .false.) then
+			if(k .eq. 1) then
+				missWheel = missWheel + 1
+			
+				if(xyOutput .eqv. .true.) then
+					Write(22,*) wheelPos(1), wheelPos(2)
+				endif
+			endif
+		   endif
+ 	   endif
+	
+	
 
 !*************************************************
 ! FIND INTERSECTION DETAILS
@@ -696,7 +767,7 @@ program MCScatteringFM_v2
     end do 	! ncyc 
 
 !************************************************
-! CLOSE OUPTUT FILES
+! CLOSE OUTPUT FILES
 !************************************************
 
       Close(22)
@@ -706,7 +777,8 @@ program MCScatteringFM_v2
       Close(26)
       Close(27)
       Close(28)
-
+      Close(29)
+      Close(30)
 
 !************************************************
 ! WRITING DATA TO FILE
@@ -731,14 +803,19 @@ program MCScatteringFM_v2
 ! Write Array Count stats
 	Open(unit=21, file='Outputs/Statistics.txt')
 	Write(21,*) ncyc, "Total ingoing trajectories Created "
-	Write(21,*) missWheel, "Trajectories missing the wheel "
-	Write(21,*) 1.0*missWheel/ncyc, "Fraction of trajectories missing the wheel "
-	Write(21,*) ncyc*npass, "Possible ingoing probed trajectories "
+	Write(21,*) beyondMax(1), "Ingoing trajectories outside probe region"
+	Write(21,*) 1.0*beyondMax(1)/ncyc, "Fraction of trajectories outside probe region"
+	Write(21,*) missWheel, "Trajectories missing the wheel (excluding those outside probe region)"
+	Write(21,*) 1.0*missWheel/(ncyc-beyondMax(1)), "Fraction of trajectories missing the wheel (excluding those outside probe region) "
+	Write(21,*) (ncyc-beyondMax(1))*npass, "Possible ingoing probed trajectories (excludes those outside probe region)"
 	Write(21,*) acceptedIngoing, "Ingoing trajectories probed "
-	Write(21,*) 1.0*acceptedIngoing/(ncyc*npass), "Ingoing acceptance ratio "
-	Write(21,*) (ncyc - missWheel)*npass, "Possible scattered trajectories "
+	Write(21,*) 1.0*acceptedIngoing/((ncyc-beyondMax(1))*npass), "Ingoing Probe efficiency (fraction of trajectories probed to those in probe region"  
+	Write(21,*) 1.0*acceptedIngoing/(ncyc*npass), "Overall calculation ingoing acceptance ratio"
+	Write(21,*) beyondMax(2), "Scattered trajectories outside probe region" 
+	Write(21,*) (ncyc - beyondMax(1) - missWheel - beyondMax(2))*npass, "Possible scattered trajectories "
 	Write(21,*) acceptedScattered, "Scattered trajectories probed "
-	Write(21,*) 1.0*acceptedScattered/((ncyc-missWheel)*npass), "Scattered trajectory acceptance ratio "
+	Write(21,*) 1.0*acceptedScattered/((ncyc-beyondMax(1)-missWheel-beyondMax(2))*npass), "Scattered trajectory acceptance ratio "
+
 
 	Do k = 1, npass
 	 Write(21,*) k, arrayCount(1,k), arrayCount(2,k)	! Write laser pass no, ingoing traj probed, scattered traj probed
@@ -766,14 +843,19 @@ program MCScatteringFM_v2
     print *, "Finished in", runTime, "seconds"
     print *,
     print *, ncyc, "Total ingoing trajectories Created "
+    print *, beyondMax(1), "Ingoing trajectories outside probe region"
+    print '(a, F4.2, a)', "        ", 1.0*beyondMax(1)/ncyc, " Fraction of trajectories outside probe region"
     print *, missWheel, "Trajectories missing the wheel "
-    print '(a, F4.2, a)', "        ", 1.0*missWheel/ncyc, " Fraction of trajectories missing the wheel "
-    print *, ncyc*npass, "Possible ingoing probed trajectories "
+    print '(a, F4.2, a)', "        ", 1.0*missWheel/(ncyc-beyondMax(1)), " Fraction of trajectories missing the wheel "
+    print *, (ncyc-beyondMax(1))*npass, "Possible ingoing probed trajectories "
     print *, acceptedIngoing, "Ingoing trajectories probed "
+    print '(a, F4.2, a)', "        ", 1.0*acceptedIngoing/((ncyc-beyondMax(1))*npass), " Probe efficiency"
     print '(a, F4.2, a)', "        ", 1.0*acceptedIngoing/(ncyc*npass), " Ingoing acceptance ratio "
-    print *, (ncyc - missWheel)*npass, "Possible scattered trajectories "
+    print *, beyondMax(2), "Scattered trajectories outside probe region"
+    print *, (ncyc - beyondMax(1) - missWheel - beyondMax(2))*npass, "Possible scattered trajectories "
     print *, acceptedScattered, "Scattered trajectories probed "
-    print '(a, F4.2, a)', "        ", 1.0*acceptedScattered/((ncyc-missWheel)*npass), " Scattered trajectory acceptance ratio "
+    print '(a, F4.2, a)', "        ", 1.0*acceptedScattered/((ncyc-beyondMax(1)-missWheel-beyondMax(2))*npass), " Scattered trajectory acceptance ratio "
     print *,
+
 
 end program MCScatteringFM_v2
