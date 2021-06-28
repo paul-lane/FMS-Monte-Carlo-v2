@@ -1,12 +1,12 @@
-0.070D0 	!Skimmer Position z direction / m
+0.3100D0	!Skimmer Position z direction / m
 0.3170D0 	!Valve position z direction / m
-0.070D0		!0.2770D0    	!Collimator position in z direction / m
-1.00D-3		!radius of skimmer / m
+0.3100D0    	!Collimator position in z direction / m
+2.82D-3		!radius of skimmer / m
 5.00D-4		!radius of valve / m
-1.00D-3   	!radius of collimator /m
+2.82D-3   	!radius of collimator /m
 0.020D0  	!z-position of the centre of the Herriott cell / m
 0.0D0		!x-position of wheel centre / m (if on axis should always be zero) hit wheel subroutine  
 -2.50D-2	!y-position of wheel centre / m (this is the offset between the wheel axle and z-axis of chamber -ve indicates below MB axis)
 5.00D-2		!wheel radius / m hit wheel subroutine
 1.00D-2		!Distance between top of bath and centre of wheel (scalar value) / m hit wheel subroutine
-
+12.5D-2		!Maximum distance a particle can be off axis and still be probed / m (I am taking this to be the radius of the bore of the chamber)

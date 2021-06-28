@@ -1,9 +1,9 @@
 -0.0         			! angle of incidence / degrees. Not used for FM
-1000000	      	   		! Number of (ingoing) particles generated
-.FALSE.				! Use sum of 3 Gaussians for speeds T/F T = yes, F = no, use Origin Parameters from Logistic5 fit 
-0.0	0.5	0.5	 	! Weightings for each of the 3 Gaussians
-150.0	150.0	180.0		! Mean (centre) of each of the 3 Gaussians
-2.0	2.0	15.0		! Standard deviation of each of the 3 Gaussians
+10000         			! Number of (ingoing) particles generated
+.TRUE.				! Use sum of 3 Gaussians for speeds T/F T = yes, F = no, use Origin Parameters from Logistic5 fit 
+0.04691	0.03364	0.04890	 	! Weightings for each of the 3 Gaussians (needs to sum to 1.0)
+154.6	161.3	179.8		! Mean (centre) of each of the 3 Gaussians
+3.8	5.9	13.1		! Standard deviation of each of the 3 Gaussians
 297.0D-03       		! valve to probe distance used in measurement which generated above Origin parameters / m (used in both Gaussian and Origin fits)
 59.91869D0			! x0 	(Origin function parameter for speed generation)
 1.00156D0			! Amax 	(Origin function parameter for speed generation)***
@@ -25,7 +25,7 @@
 .true.				! Blurring on (uses transverse speed components to overwrite geometry of MB)
 1.0D0                           ! Fraction of Gaussian in Gaussian/Lorentzian mix for ingoing transverse temp blurring (1 = all Gaussian, 0 = all Lorentzian)
 0D0				! Mean of Gaussian for ingoing transverse temp blurring / ms-1
-250D0				! Std Dev of Gaussian for ingoing transverse temp blurring / ms-1
+309D0				! Std Dev of Gaussian for ingoing transverse temp blurring / ms-1
 40D0				! Gamma value of Lorentzian for ingoing transverse temp blurring / ms-1		
 
 
